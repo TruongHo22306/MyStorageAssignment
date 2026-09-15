@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { calculateVolume, defaultInputs, displayVolume, evaluateInputs, priceComparison } from '../src/calculations';
+import { calculateVolume, capacityStatus, defaultInputs, displayVolume, evaluateInputs, priceComparison } from '../src/calculations';
 
 test('default arithmetic uses the captured prices and rounds volume only for display', () => {
   expect(calculateVolume(6, 60, 40, 40)).toBe(0.576);
@@ -111,4 +111,100 @@ test('desktop and mobile layout render images and fit the viewport', async ({ pa
     await page.screenshot({ path: `docs/verification/${name}.png`, fullPage: true });
   }
   expect(errors).toEqual([]);
+});
+
+test('capacityStatus returns correct status for key volumes', () => {
+  // 0.576 CBM: both fit (cool=1, standard=2)
+  expect(capacityStatus(0.576)).toEqual({ coolExceeds: false, standardExceeds: false, overall: 'both-fit' });
+  // 1.152 CBM: cool exceeds (>1), standard fits (<=2)
+  expect(capacityStatus(1.152)).toEqual({ coolExceeds: true, standardExceeds: false, overall: 'one-exceeds' });
+  // 2.304 CBM: both exceed
+  expect(capacityStatus(2.304)).toEqual({ coolExceeds: true, standardExceeds: true, overall: 'both-exceed' });
+  // Exact boundary: 1.0 CBM does NOT exceed cool (strict >)
+  expect(capacityStatus(1.0)).toEqual({ coolExceeds: false, standardExceeds: false, overall: 'both-fit' });
+  // Just above boundary: 1.0000001 CBM exceeds cool
+  expect(capacityStatus(1.0000001)).toEqual({ coolExceeds: true, standardExceeds: false, overall: 'one-exceeds' });
+  // Exact standard boundary: 2.0 CBM does NOT exceed standard
+  expect(capacityStatus(2.0)).toEqual({ coolExceeds: true, standardExceeds: false, overall: 'one-exceeds' });
+});
+
+test('6 boxes: both fit, savings and lower-price ribbon shown, no capacity warnings', async ({ page }) => {
+  await page.goto('/');
+  // Default is 6 boxes, both should fit
+  await expect(page.getByTestId('volume')).toHaveText('0.58');
+  await expect(page.locator('.capacity-warning')).toHaveCount(0);
+  await expect(page.locator('.quote-ribbon.over-capacity')).toHaveCount(0);
+  await expect(page.locator('.savings')).toBeVisible();
+  await expect(page.locator('.savings')).toContainText('396.000 VND');
+  await expect(page.getByText('Giá ghi nhận thấp hơn · Có điều kiện')).toBeVisible();
+  await expect(page.locator('.capacity-notice')).toHaveCount(0);
+  await expect(page.locator('.explanation')).toContainText('Chưa tự động chọn Cool Locker');
+});
+
+test('12 boxes: cool exceeds, standard fits; savings replaced, cool ribbon changed', async ({ page }) => {
+  await page.goto('/');
+  await page.getByLabel('Số thùng').fill('12');
+  await expect(page.getByTestId('volume')).toHaveText('1.15');
+  // Cool card: over-capacity ribbon, capacity warning near heading
+  await expect(page.locator('.cool .quote-ribbon.over-capacity')).toBeVisible();
+  await expect(page.locator('.cool .quote-ribbon')).toContainText('Vượt dung tích danh nghĩa');
+  await expect(page.locator('.cool .capacity-warning')).toBeVisible();
+  // Standard card: normal ribbon, no capacity warning
+  await expect(page.locator('.standard .quote-ribbon.over-capacity')).toHaveCount(0);
+  await expect(page.locator('.standard .quote-ribbon')).toContainText('Phương án tiêu chuẩn');
+  await expect(page.locator('.standard .capacity-warning')).toHaveCount(0);
+  // Savings replaced with capacity notice
+  await expect(page.locator('.savings')).toHaveCount(0);
+  await expect(page.locator('.capacity-notice')).toBeVisible();
+  await expect(page.locator('.capacity-notice')).toContainText('Một phương án vượt dung tích danh nghĩa');
+  // Explanation replaced
+  await expect(page.locator('.explanation')).toContainText('không thể được coi là lựa chọn thay thế phù hợp');
+  // Prices retained as reference
+  await expect(page.locator('.cool .total')).toContainText('VND');
+  await expect(page.locator('.standard .total')).toContainText('VND');
+  // Return to default
+  await page.getByRole('button', { name: 'Khôi phục giá trị ban đầu' }).click();
+  await expect(page.getByLabel('Số thùng')).toHaveValue('6');
+  await expect(page.locator('.savings')).toBeVisible();
+});
+
+test('24 boxes: both exceed; both ribbons changed, new quote needed', async ({ page }) => {
+  await page.goto('/');
+  await page.getByLabel('Số thùng').fill('24');
+  await expect(page.getByTestId('volume')).toHaveText('2.30');
+  // Both cards: over-capacity ribbon and capacity warning
+  await expect(page.locator('.quote-ribbon.over-capacity')).toHaveCount(2);
+  await expect(page.locator('.capacity-warning')).toHaveCount(2);
+  // Savings replaced with both-exceed notice
+  await expect(page.locator('.savings')).toHaveCount(0);
+  await expect(page.locator('.capacity-notice')).toContainText('Cả hai phương án đều vượt dung tích danh nghĩa');
+  await expect(page.locator('.capacity-notice')).toContainText('Cần báo giá mới');
+  // Explanation: neither has capacity
+  await expect(page.locator('.explanation')).toContainText('Không phương án ghi nhận nào có đủ dung tích danh nghĩa');
+  // Pricing disclaimer still present
+  await expect(page.locator('.calculation-note')).toBeVisible();
+  // Return to default
+  await page.getByRole('button', { name: 'Khôi phục giá trị ban đầu' }).click();
+  await expect(page.getByLabel('Số thùng')).toHaveValue('6');
+  await expect(page.locator('.savings')).toBeVisible();
+});
+
+test('capacity boundary: volume exactly at nominal capacity does not trigger exceeds', async ({ page }) => {
+  await page.goto('/');
+  // 1 CBM = 1 box at 100x100x100cm
+  await page.getByLabel('Số thùng').fill('1');
+  await page.getByLabel('Dài (cm)', { exact: true }).fill('100');
+  await page.getByLabel('Rộng (cm)', { exact: true }).fill('100');
+  await page.getByLabel('Cao (cm)', { exact: true }).fill('100');
+  await expect(page.getByTestId('volume')).toHaveText('1.00');
+  // Cool = 1 CBM: volume == capacity, strict > means no exceeds
+  await expect(page.locator('.cool .capacity-warning')).toHaveCount(0);
+  await expect(page.locator('.cool .quote-ribbon.over-capacity')).toHaveCount(0);
+  // Standard = 2 CBM: also no exceeds
+  await expect(page.locator('.standard .capacity-warning')).toHaveCount(0);
+  // Savings should still be shown (both fit)
+  await expect(page.locator('.savings')).toBeVisible();
+  // Return to default
+  await page.getByRole('button', { name: 'Khôi phục giá trị ban đầu' }).click();
+  await expect(page.getByLabel('Số thùng')).toHaveValue('6');
 });

@@ -88,12 +88,15 @@ export default function App() {
               <div className="comparison-heading"><h2 id="comparison-heading">{text.options}</h2><span>{text.vat}</span></div>
               {!result.capturedBoxes && <p className="notice" role="status"><CircleAlert size={18} aria-hidden="true" />{text.changed}</p>}
               <div className="quotes">
-                {capturedQuote.options.map((option) => (
+                {capturedQuote.options.map((option) => {
+                  const optionExceeds = option.id === 'cool' ? result.capacity.coolExceeds : result.capacity.standardExceeds;
+                  return (
                   <article key={option.id} className={`quote ${option.id}`} aria-labelledby={`${option.id}-heading`}>
-                    <div className="quote-ribbon">{option.conditional ? text.lower : text.standard}</div>
+                    <div className={`quote-ribbon${optionExceeds ? ' over-capacity' : ''}`}>{optionExceeds ? text.exceedsCapacity : option.conditional ? text.lower : text.standard}</div>
                     <div className="quote-body">
                       <div className="product-type">{option.conditional ? <Snowflake size={21} aria-hidden="true" /> : <Warehouse size={21} aria-hidden="true" />}{text.services[option.id]}</div>
                       <h3 id={`${option.id}-heading`}>{option.name}</h3>
+                      {optionExceeds && <p className="capacity-warning">{text.exceeds}</p>}
                       <p className="price">{money(option.monthlyPrice)}<span>{text.month}</span></p>
                       <div className="total"><span>{text.total} {result.months} {text.months}</span><strong>{money(option.monthlyPrice * result.months)}</strong></div>
                       <dl>
@@ -102,13 +105,14 @@ export default function App() {
                         <dt>{text.temperature}</dt><dd>{text.temperatures[option.id]}</dd>
                         <dt>{text.conditions}</dt><dd>{text.eligibility[option.id]}</dd>
                       </dl>
-                      {result.volume > option.capacityCbm && <p className="field-error">{text.exceeds}</p>}
                       <div className="quote-source"><p>{text.source}</p><p><Info size={14} aria-hidden="true" />{text.availability}</p></div>
                     </div>
                   </article>
-                ))}
+                  );
+                })}
               </div>
 
+              {result.capacity.overall === 'both-fit' ? <>
               <div className="savings" aria-live="polite">
                 <div><h3>{text.difference}</h3><p>{text.monthlyDifference}: <strong>{money(result.prices.monthlyDifference)}</strong></p></div>
                 <div className="savings-amount"><strong>{money(result.prices.totalDifference)}</strong><span>{result.months} {text.months} · {text.beforeVat}</span></div>
@@ -119,6 +123,17 @@ export default function App() {
                 <h2 id="explanation-heading">{text.explanation}</h2>
                 <p>{text.coolReason}</p><p>{text.standardReason}</p>
               </section>
+              </> : <>
+              <div className="capacity-notice" aria-live="polite">
+                <p><CircleAlert size={18} aria-hidden="true" />{result.capacity.overall === 'both-exceed' ? text.bothExceedsSummary : text.oneExceedsSummary}</p>
+              </div>
+              <p className="calculation-note">{text.estimate}</p>
+
+              <section className="explanation" aria-labelledby="explanation-heading">
+                <h2 id="explanation-heading">{text.explanation}</h2>
+                <p>{result.capacity.overall === 'both-exceed' ? text.bothExceedsExplanation : text.oneExceedsExplanation}</p>
+              </section>
+              </>}
             </section> : <section className="invalid-state" role="status"><CircleAlert size={26} aria-hidden="true" /><h2>{text.invalidTitle}</h2><p>{text.invalid}</p></section>}
 
             <section className="verification" aria-labelledby="verify-heading">

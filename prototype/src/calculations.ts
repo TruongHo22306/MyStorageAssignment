@@ -25,6 +25,25 @@ export function priceComparison(months: number) {
   };
 }
 
+export type CapacityOverall = 'both-fit' | 'one-exceeds' | 'both-exceed';
+
+export interface CapacityStatus {
+  coolExceeds: boolean;
+  standardExceeds: boolean;
+  overall: CapacityOverall;
+}
+
+/** Compare unrounded volume against each option's nominal capacity using strict >. */
+export function capacityStatus(volume: number): CapacityStatus {
+  const [cool, standard] = capturedQuote.options;
+  const coolExceeds = volume > cool.capacityCbm;
+  const standardExceeds = volume > standard.capacityCbm;
+  const overall: CapacityOverall =
+    coolExceeds && standardExceeds ? 'both-exceed' :
+    coolExceeds || standardExceeds ? 'one-exceeds' : 'both-fit';
+  return { coolExceeds, standardExceeds, overall };
+}
+
 export function evaluateInputs(inputs: Inputs) {
   const errors: InputErrors = {};
   for (const field of numericFields) {
@@ -45,7 +64,8 @@ export function evaluateInputs(inputs: Inputs) {
   }
   const capturedBoxes = (['boxes', 'length', 'width', 'height'] as const)
     .every((field) => Number(inputs[field]) === Number(defaultInputs[field]));
-  return { errors, result: { volume, months: +inputs.months, prices, capturedBoxes } };
+  const capacity = capacityStatus(volume);
+  return { errors, result: { volume, months: +inputs.months, prices, capturedBoxes, capacity } };
 }
 
 export function displayVolume(volume: number) {
