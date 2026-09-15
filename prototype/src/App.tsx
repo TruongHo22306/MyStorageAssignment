@@ -130,7 +130,7 @@ export default function App() {
               <p className="calculation-note">{text.estimate}</p>
 
               <section className="explanation" aria-labelledby="explanation-heading">
-                <h2 id="explanation-heading">{text.explanation}</h2>
+                <h2 id="explanation-heading">{result.capacity.overall === 'both-exceed' ? text.bothExceedsHeading : text.oneExceedsHeading}</h2>
                 <p>{result.capacity.overall === 'both-exceed' ? text.bothExceedsExplanation : text.oneExceedsExplanation}</p>
               </section>
               </>}

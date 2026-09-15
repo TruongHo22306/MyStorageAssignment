@@ -168,7 +168,7 @@ test('12 boxes: cool exceeds, standard fits; savings replaced, cool ribbon chang
   await expect(page.locator('.savings')).toBeVisible();
 });
 
-test('24 boxes: both exceed; both ribbons changed, new quote needed', async ({ page }) => {
+test('24 boxes: both exceed; headings follow 6/12/24/6 boxes in Vietnamese and English', async ({ page }) => {
   await page.goto('/');
   await page.getByLabel('Số thùng').fill('24');
   await expect(page.getByTestId('volume')).toHaveText('2.30');
@@ -187,6 +187,26 @@ test('24 boxes: both exceed; both ribbons changed, new quote needed', async ({ p
   await page.getByRole('button', { name: 'Khôi phục giá trị ban đầu' }).click();
   await expect(page.getByLabel('Số thùng')).toHaveValue('6');
   await expect(page.locator('.savings')).toBeVisible();
+
+  await expect(page.getByLabel('Dài (cm)', { exact: true })).toHaveValue('60');
+  await expect(page.getByLabel('Rộng (cm)', { exact: true })).toHaveValue('40');
+  await expect(page.getByLabel('Cao (cm)', { exact: true })).toHaveValue('40');
+  const explanation = page.locator('.explanation');
+  for (const [boxes, viHeading, enHeading] of [
+    ['6', 'Giá thấp hơn, điều kiện khác nhau', 'Lower price, different conditions'],
+    ['12', 'Một phương án vượt dung tích', 'One option exceeds nominal capacity'],
+    ['24', 'Cần phương án lưu trữ khác', 'A different storage option is needed'],
+    ['6', 'Giá thấp hơn, điều kiện khác nhau', 'Lower price, different conditions'],
+  ]) {
+    await page.locator('#boxes').fill(boxes);
+    for (const [language, heading] of [['Tiếng Việt', viHeading], ['English', enHeading]]) {
+      await page.getByRole('button', { name: language, exact: true }).click();
+      await expect(explanation.getByRole('heading', { level: 2 })).toHaveText(heading);
+      if (boxes !== '6') {
+        await expect(explanation).not.toContainText(/Giá thấp hơn, điều kiện khác nhau|Lower price, different conditions/);
+      }
+    }
+  }
 });
 
 test('capacity boundary: volume exactly at nominal capacity does not trigger exceeds', async ({ page }) => {
