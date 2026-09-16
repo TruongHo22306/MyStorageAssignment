@@ -4,7 +4,9 @@
 
 Choose F-02 as the primary prototype finding for **Transparent Storage Quote Recommendation**. The evidence supports improving premature absolute wording and an incomplete comparison in the candidate session. It does not establish independently bookable inventory or prove the standard recommendation was incorrect. Use F-01 as a secondary interaction detail only if Vietnamese continuity fits naturally. F-04 is not primary: STOW has now confirmed eligibility in the conversation; the remaining issue is public documentation and applicable terms.
 
-The local React/TypeScript fixture-based screen is implemented in `prototype/`; see its [README](../prototype/README.md) for run commands, seven passing tests, successful build and verification limits. This does not change the finding's evidence status. It was produced in Codex; actual Claude Code work remains an assignment requirement.
+The local React/TypeScript fixture-based screen is implemented in `prototype/`; see its [README](../prototype/README.md) for the historical 12/12 test result, successful build and verification limits. The candidate's transcript reconciliation identifies Codex for the initial version, Claude Opus via Antigravity IDE for capacity-first messaging (`0162e89`), and Codex for the heading and bilingual assertions (`17e19d3`). The earlier two-Claude-Code claim was mistaken and withdrawn; those sessions do not establish Claude Code use. The candidate identified the scenario, reviewed with ChatGPT and requested correction; AI performed the patch. See [attribution reconciliation](evidence-register.md#attribution-reconciliation); attribution is not inferred from commits.
+
+Submission framing: F-02 is primary and F-01 secondary. F-03/F-04 are retained below as verification limits with status Needs verification, not established product bugs. Prototype capacity/heading corrections are engineering iterations, not additional STOW findings. [Submission report](submission-report.md) summarizes this distinction.
 
 ## F-01 Quote Button Does Not Preserve Vietnamese
 
@@ -20,7 +22,7 @@ Preconditions:
 - STOW has displayed service cards and an English "Get Self Storage quote" button.
 - The candidate's registration/authentication state is unresolved.
 
-Exact prompt/action sequence, candidate-reported:
+Action sequence, candidate-reported summary (not a verbatim prompt export):
 
 1. Candidate asked about storage in Vietnamese.
 2. STOW replied in Vietnamese but displayed English service cards and an English "Get Self Storage quote" button.
@@ -95,7 +97,7 @@ Preconditions:
 - Candidate wants late self-access at 22:00.
 - Candidate is comparing unit suitability and monthly price.
 
-Exact prompt/action sequence, candidate-reported:
+Action sequence, candidate-reported summary (not a verbatim prompt export):
 
 1. Earlier in the conversation, STOW recommended a 2 CBM Non-AC unit at 375 Vo Nguyen Giap.
 2. STOW called that 2 CBM Non-AC unit the "optimal cost" option.
@@ -173,6 +175,8 @@ Prototype suitability:
 ## F-03 Cool Locker Claims Are Not Independently Verifiable From Public Sources
 
 Status: Needs verification
+
+Report category: verification limit, not a proven bug. The provisional impact assessment below must not be presented as demonstrated harm.
 
 User goal: Trust STOW's product, price, availability, and environmental-condition claims before choosing a quote path.
 
@@ -258,6 +262,8 @@ Prototype suitability:
 
 Status: Needs verification
 
+Report category: verification limit, not a proven bug. STOW answered eligibility conversationally; the remaining gap is independent documentation/terms verification.
+
 User goal: Book a small 24/7 self-access unit for six personal boxes.
 
 Preconditions:
@@ -266,7 +272,7 @@ Preconditions:
 - Candidate is considering the 1 CBM Cool Locker option at 375 Vo Nguyen Giap.
 - STOW has connected the Cool Locker option to the Wine Storage booking category.
 
-Exact prompt/action sequence, candidate-reported:
+Action sequence, candidate-reported summary (not a verbatim prompt export):
 
 1. Candidate continued investigating the 1 CBM Cool Locker option.
 2. STOW stated that the 1 CBM Cool Locker is a repurposed Wine Locker at 375 Vo Nguyen Giap.
@@ -348,10 +354,12 @@ Status: Needs verification
 
 This is not a bug finding yet. The candidate reported that the initial chat screen and sidebar showed no visible login/register entry, and that they could send a message without reporting registration. The assignment requires sessions associated with the candidate's real email and phone, but the current evidence does not prove that authentication is absent or broken.
 
+Latest candidate confirmation (CRE-023): real email and phone were supplied in the STOW session. STOW reportedly acknowledged saving them in CRM and not creating a booking. The action of providing details is candidate-reported; CRM persistence and session association are separate, independently unverified claims. Registration/session association is not marked complete. Full contact values are excluded from public documents.
+
 Next evidence needed:
 
 - Screenshot of the initial STOW screen and sidebar.
-- Whether STOW later requested email/phone during the conversation.
+- A redacted transcript of the contact-details exchange and CRM/no-booking acknowledgment; exact wording and artifact path remain missing.
 - Whether a profile/session/account page exists after first message.
 - Whether the candidate's session can be associated with the required real contact details.
 
@@ -413,9 +421,9 @@ Fail criteria:
 
 ### T-03 Cheaper Option Challenge
 
-Status: Pending, not run.
+Status: Candidate-reported challenge/result recorded in CRE-004 through CRE-019; no separate repeat of the proposed test is established.
 
-Latest manual-test prompt:
+Previously drafted English prompt (not verified as the exact original prompt sent):
 
 > Why was the initial recommendation a 2 CBM Non-AC unit at 375 Vo Nguyen Giap for 1,188,000 VND/month when a smaller option might be cheaper?
 
@@ -470,7 +478,7 @@ F-02 is selected for a captured-data prototype. These gaps limit report claims a
 - Screenshot filenames or transcript IDs for F-01, F-02, F-03, and F-04.
 - Exact date/time of the STOW sessions, or `unknown` if unavailable.
 - Browser/device/viewport used for the screenshots.
-- Whether the candidate was logged in or whether STOW requested contact details later.
+- Independent session/CRM association evidence; candidate confirms sending real contact details, but STOW's acknowledgment alone does not verify storage or registration.
 - Timestamped booking/facility evidence for the 2 CBM Non-AC price and availability.
 - Timestamped booking/facility evidence for the 1 CBM Cool Locker price, availability, temperature, humidity, lock, and access claims.
 - Exact internal dimensions and door dimensions for the specific 1 CBM Cool Locker, if physical fit is used as evidence.

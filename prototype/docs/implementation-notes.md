@@ -33,11 +33,13 @@ The finding concerns what customers see before choosing, not an observed invento
 
 ## Verification Boundary
 
-See [README results](../README.md#verification-results). Tests/screenshots cover this prototype only. They do not reproduce STOW, independently confirm quotes or satisfy a candidate manual test. The interactive browser connector was unavailable; headless Chrome testing and visual screenshot review were completed.
+See [README results](../README.md#verification-results). Historical tests and baseline screenshots cover the prototype only, not STOW reproduction or independent quote verification. The heading-fix session ran automated checks without a visual check. Candidate desktop checks and ChatGPT image review are separately candidate-reported; no candidate mobile check is established. No test or visual check was repeated for this documentation update.
 
 ## Assignment Provenance
 
-The session ran in OpenAI Codex. The prompt's "You are Claude Code" wording does not change the tool that performed the work. Actual Claude Code usage, candidate understanding/review and authentic rejected or revised Claude Code output remain separate assignment requirements. None is claimed here.
+Based on the candidate's transcript reconciliation: Codex built the initial prototype (7/7 tests and build passed); Claude Opus via Antigravity IDE implemented capacity-first messaging at `0162e89` (12/12 and build passed); Codex corrected the heading and Vietnamese/English assertions at `17e19d3` (12/12 and build passed). These are historical transcript results, not checks rerun for this document. Commits identify revisions, not the tools used.
+
+Correction: the candidate withdraws the earlier attribution of both follow-ups to Claude Code. The candidate identified the scenario, reviewed an image with ChatGPT and requested correction; AI implemented the patch. The reconciled sessions do not establish Claude Code use, so that assignment requirement is not demonstrated as complete. See the [iteration record](ai-decisions.md#iteration-record) and [attribution reconciliation](../../docs/evidence-register.md#attribution-reconciliation). No new session exports were independently inspected in this pass; the assignment does not require the entire prototype to be Claude-generated.
 
 ## Technical References
 
